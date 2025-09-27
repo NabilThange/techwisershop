@@ -91,9 +91,9 @@
   --sidebar-ring: 22 93% 53%; /* Brand Orange (#f97316 - orange-500) */
 }
 
-@theme {
+@theme inline {
   /* Updated to use Geist Mono as primary font for tactical aesthetic */
-  --font-sans: var(--font-geist-mono);
+  --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 
   --color-background: hsl(var(--background));
@@ -163,14 +163,14 @@
     line-height: 1.2;
     letter-spacing: -0.01em;
     font-weight: 700; /* Bold for tactical aesthetic */
-    font-family: var(--font-mono);
+    font-family: var(--font-geist-mono);
   }
 
   p,
   span,
   div {
     line-height: 1.4;
-    font-family: var(--font-mono);
+    font-family: var(--font-geist-mono);
   }
 
   *:focus-visible {

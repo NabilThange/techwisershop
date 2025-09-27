@@ -95,7 +95,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
-      <body className={`font-mono ${GeistSans.variable} ${GeistMono.variable}`}>
+      <body 
+        className={`font-mono`}
+        style={{ 
+          // @ts-ignore
+          "--font-geist-sans": GeistSans.style.fontFamily,
+          // @ts-ignore
+          "--font-geist-mono": GeistMono.style.fontFamily,
+        } as React.CSSProperties}
+      >
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
           <StructuredData type="organization" data={{}} />
           <StructuredData type="website" data={{}} />
