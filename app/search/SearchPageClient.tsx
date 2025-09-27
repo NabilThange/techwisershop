@@ -1,0 +1,295 @@
+"use client"
+
+import { Suspense, useEffect, useState } from "react"
+import { notFound, useRouter, useSearchParams } from "next/navigation"
+import { Search, Filter } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Header } from "@/components/header"
+import { Footer } from "@/components/footer"
+import { ProductCard } from "@/components/product-card"
+import { SearchBar } from "@/components/search-bar"
+import { supabase } from '@/lib/supabase-client'
+
+interface SearchPageProps {
+  searchParams: {
+    q?: string
+    category?: string
+    sort?: string
+  }
+}
+
+export function SearchPageClient() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const query = searchParams.get("q") || ""
+  const category = searchParams.get("category")
+  const sort = searchParams.get("sort") || "relevance"
+  
+  const [filteredProducts, setFilteredProducts] = useState<any[]>([])
+  const [categories, setCategories] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    if (!query) {
+      notFound()
+    }
+    
+    const fetchSearchResults = async () => {
+      setLoading(true)
+      
+      // Fetch products based on search query
+      let queryBuilder = supabase
+        .from('products')
+        .select(`
+          *,
+          categories (name),
+          brands (name),
+          product_images (image_url)
+        `)
+      
+      // Apply search filters
+      if (query) {
+        queryBuilder = queryBuilder.or(
+          `title.ilike.%${query}%,brand.ilike.%${query}%,categories.name.ilike.%${query}%,description.ilike.%${query}%`
+        )
+      }
+      
+      if (category) {
+        queryBuilder = queryBuilder.eq('categories.name', category)
+      }
+      
+      const { data, error } = await queryBuilder
+      
+      if (error) {
+        console.error('Error fetching search results:', error)
+      } else {
+        // Transform data to match expected format
+        const transformedProducts = data?.map((product: any) => ({
+          id: product.id,
+          slug: product.slug,
+          title: product.title,
+          price: product.price,
+          originalPrice: product.original_price,
+          currency: product.currency,
+          image: product.main_image_url,
+          images: product.product_images?.map((img: any) => img.image_url) || [product.main_image_url],
+          amazonLink: product.amazon_link,
+          flipkartLink: product.flipkart_link,
+          rating: product.rating,
+          reviewCount: product.review_count,
+          shortDescription: product.short_description,
+          description: product.description,
+          category: product.categories?.name || product.category,
+          brand: product.brands?.name || product.brand,
+          specs: {},
+          pros: [],
+          cons: [],
+          youtubeVideoId: product.youtube_video_id,
+          inStock: product.in_stock,
+          featured: product.featured,
+          tags: product.tags || [],
+          createdAt: product.created_at
+        })) || []
+        
+        setFilteredProducts(transformedProducts)
+      }
+      
+      // Fetch categories
+      const { data: categoriesData, error: categoriesError } = await supabase
+        .from('categories')
+        .select('*')
+      
+      if (!categoriesError) {
+        setCategories(categoriesData || [])
+      }
+      
+      setLoading(false)
+    }
+    
+    fetchSearchResults()
+  }, [query, category])
+
+  // Apply sorting
+  useEffect(() => {
+    if (filteredProducts.length > 0) {
+      const sortedProducts = [...filteredProducts]
+      
+      switch (sort) {
+        case "price-low":
+          sortedProducts.sort((a, b) => a.price - b.price)
+          break
+        case "price-high":
+          sortedProducts.sort((a, b) => b.price - a.price)
+          break
+        case "rating":
+          sortedProducts.sort((a, b) => b.rating - a.rating)
+          break
+        case "newest":
+          // In a real app, you'd sort by creation date
+          sortedProducts.sort((a, b) => b.id.localeCompare(a.id))
+          break
+        default:
+          // Relevance - keep original order from search
+          break
+      }
+      
+      setFilteredProducts(sortedProducts)
+    }
+  }, [sort])
+
+  if (!query) {
+    notFound()
+  }
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Header />
+
+      <main className="container mx-auto px-4 py-8">
+        {/* Search Header */}
+        <div className="mb-8">
+          <div className="mb-4 flex items-center gap-2">
+            <Search className="h-5 w-5 text-muted-foreground" />
+            <h1 className="text-2xl font-bold">Search Results for "{query}"</h1>
+          </div>
+          <p className="text-muted-foreground">
+            Found {filteredProducts.length} product{filteredProducts.length !== 1 ? "s" : ""}
+          </p>
+        </div>
+
+        {/* Search Bar */}
+        <div className="mb-8">
+          <SearchBar className="max-w-md" />
+        </div>
+
+        {/* Filters and Sort */}
+        <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div className="flex flex-wrap gap-2">
+            <Badge
+              variant={!category ? "default" : "outline"}
+              className="cursor-pointer hover:bg-primary hover:text-primary-foreground"
+              onClick={() => {
+                const params = new URLSearchParams(searchParams)
+                params.delete("category")
+                router.push(`/search?${params.toString()}`)
+              }}
+            >
+              All Categories
+            </Badge>
+            {categories.map((cat) => (
+              <Badge
+                key={cat.id}
+                variant={category === cat.name.toLowerCase() ? "default" : "outline"}
+                className="cursor-pointer hover:bg-primary hover:text-primary-foreground"
+                onClick={() => {
+                  const params = new URLSearchParams(searchParams)
+                  params.set("category", cat.name.toLowerCase())
+                  router.push(`/search?${params.toString()}`)
+                }}
+              >
+                {cat.name}
+              </Badge>
+            ))}
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm">
+              <Filter className="mr-2 h-4 w-4" />
+              Filter
+            </Button>
+            <select
+              value={sort}
+              onChange={(e) => {
+                const params = new URLSearchParams(searchParams)
+                params.set("sort", e.target.value)
+                router.push(`/search?${params.toString()}`)
+              }}
+              className="rounded-md border border-input bg-background px-3 py-2 text-sm"
+            >
+              <option value="relevance">Relevance</option>
+              <option value="price-low">Price: Low to High</option>
+              <option value="price-high">Price: High to Low</option>
+              <option value="rating">Highest Rated</option>
+              <option value="newest">Newest</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Results */}
+        {loading ? (
+          <SearchResultsSkeleton />
+        ) : filteredProducts.length > 0 ? (
+          <Suspense fallback={<SearchResultsSkeleton />}>
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {filteredProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          </Suspense>
+        ) : (
+          <div className="text-center py-12">
+            <Search className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
+            <h2 className="mb-2 text-xl font-semibold">No products found</h2>
+            <p className="mb-6 text-muted-foreground">Try adjusting your search terms or browse our categories</p>
+            <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+              <Button variant="outline" asChild>
+                <a href="/products">Browse All Products</a>
+              </Button>
+              <Button variant="outline" asChild>
+                <a href="/categories">View Categories</a>
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Search Suggestions */}
+        {filteredProducts.length === 0 && !loading && (
+          <div className="mt-12">
+            <h3 className="mb-4 text-lg font-semibold">Popular Searches</h3>
+            <div className="flex flex-wrap gap-2">
+              {["iPhone", "MacBook", "Sony headphones", "Samsung watch", "Gaming mouse", "4K monitor"].map(
+                (suggestion) => (
+                  <Badge
+                    key={suggestion}
+                    variant="outline"
+                    className="cursor-pointer hover:bg-primary hover:text-primary-foreground"
+                    onClick={() => {
+                      const params = new URLSearchParams(searchParams)
+                      params.set("q", suggestion)
+                      router.push(`/search?${params.toString()}`)
+                    }}
+                  >
+                    {suggestion}
+                  </Badge>
+                ),
+              )}
+            </div>
+          </div>
+        )}
+      </main>
+
+      <Footer />
+    </div>
+  )
+}
+
+function SearchResultsSkeleton() {
+  return (
+    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      {[...Array(8)].map((_, i) => (
+        <Card key={i} className="overflow-hidden">
+          <div className="aspect-square bg-muted animate-pulse" />
+          <CardContent className="p-4">
+            <div className="space-y-2">
+              <div className="h-4 bg-muted rounded animate-pulse" />
+              <div className="h-4 bg-muted rounded w-3/4 animate-pulse" />
+              <div className="h-6 bg-muted rounded w-1/2 animate-pulse" />
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  )
+}

@@ -1,0 +1,339 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  /* TACTICAL OPS Design System - 5 Core Colors */
+  --background: 0 0% 0%; /* Pure Black (#000000) */
+  --foreground: 0 0% 100%; /* Pure White (#ffffff) */
+
+  --card: 0 0% 9%; /* Dark Gray (#171717 - neutral-900) */
+  --card-foreground: 0 0% 100%; /* Pure White (#ffffff) */
+  --popover: 0 0% 9%; /* Dark Gray (#171717 - neutral-900) */
+  --popover-foreground: 0 0% 100%; /* Pure White (#ffffff) */
+
+  --primary: 22 93% 53%; /* Brand Orange (#f97316 - orange-500) */
+  --primary-foreground: 0 0% 100%; /* Pure White (#ffffff) */
+  --secondary: 0 0% 25%; /* Medium Gray (#404040 - neutral-700) */
+  --secondary-foreground: 0 0% 100%; /* Pure White (#ffffff) */
+  --muted: 0 0% 25%; /* Medium Gray (#404040 - neutral-700) */
+  --muted-foreground: 0 0% 64%; /* Light Gray (#a3a3a3 - neutral-400) */
+
+  --accent: 22 93% 53%; /* Brand Orange (#f97316 - orange-500) */
+  --accent-foreground: 0 0% 100%; /* Pure White (#ffffff) */
+
+  --destructive: 0 84% 60%; /* Error Red (#ef4444 - red-500) */
+  --destructive-foreground: 0 0% 100%; /* Pure White (#ffffff) */
+  --border: 0 0% 25%; /* Medium Gray (#404040 - neutral-700) */
+  --input: 0 0% 25%; /* Medium Gray (#404040 - neutral-700) */
+  --ring: 22 93% 53%; /* Brand Orange (#f97316 - orange-500) */
+
+  /* Chart colors for data visualization */
+  --chart-1: 22 93% 53%; /* Brand Orange (#f97316) - Primary line */
+  --chart-2: 0 0% 100%; /* Pure White (#ffffff) - Secondary line */
+  --chart-3: 0 0% 64%; /* Light Gray (#a3a3a3) - Tertiary */
+  --chart-4: 0 0% 45%; /* Medium-Light Gray (#737373) - Quaternary */
+  --chart-5: 0 0% 15%; /* Darker Gray (#262626) - Quinary */
+
+  --radius: 0.25rem; /* 4px - Geometric precision */
+
+  /* Sidebar colors */
+  --sidebar: 0 0% 9%; /* Dark Gray (#171717 - neutral-900) */
+  --sidebar-foreground: 0 0% 100%; /* Pure White (#ffffff) */
+  --sidebar-primary: 22 93% 53%; /* Brand Orange (#f97316 - orange-500) */
+  --sidebar-primary-foreground: 0 0% 100%; /* Pure White (#ffffff) */
+  --sidebar-accent: 0 0% 25%; /* Medium Gray (#404040 - neutral-700) */
+  --sidebar-accent-foreground: 0 0% 64%; /* Light Gray (#a3a3a3 - neutral-400) */
+  --sidebar-border: 0 0% 25%; /* Medium Gray (#404040 - neutral-700) */
+  --sidebar-ring: 22 93% 53%; /* Brand Orange (#f97316 - orange-500) */
+}
+
+.dark {
+  /* Same tactical color scheme for dark theme */
+  --background: 0 0% 0%; /* Pure Black (#000000) */
+  --foreground: 0 0% 100%; /* Pure White (#ffffff) */
+
+  --card: 0 0% 9%; /* Dark Gray (#171717 - neutral-900) */
+  --card-foreground: 0 0% 100%; /* Pure White (#ffffff) */
+  --popover: 0 0% 9%; /* Dark Gray (#171717 - neutral-900) */
+  --popover-foreground: 0 0% 100%; /* Pure White (#ffffff) */
+
+  --primary: 22 93% 53%; /* Brand Orange (#f97316 - orange-500) */
+  --primary-foreground: 0 0% 100%; /* Pure White (#ffffff) */
+  --secondary: 0 0% 25%; /* Medium Gray (#404040 - neutral-700) */
+  --secondary-foreground: 0 0% 100%; /* Pure White (#ffffff) */
+  --muted: 0 0% 25%; /* Medium Gray (#404040 - neutral-700) */
+  --muted-foreground: 0 0% 64%; /* Light Gray (#a3a3a3 - neutral-400) */
+
+  --accent: 22 93% 53%; /* Brand Orange (#f97316 - orange-500) */
+  --accent-foreground: 0 0% 100%; /* Pure White (#ffffff) */
+
+  --destructive: 0 84% 60%; /* Error Red (#ef4444 - red-500) */
+  --destructive-foreground: 0 0% 100%; /* Pure White (#ffffff) */
+  --border: 0 0% 25%; /* Medium Gray (#404040 - neutral-700) */
+  --input: 0 0% 25%; /* Medium Gray (#404040 - neutral-700) */
+  --ring: 22 93% 53%; /* Brand Orange (#f97316 - orange-500) */
+
+  --chart-1: 22 93% 53%; /* Brand Orange (#f97316) - Primary line */
+  --chart-2: 0 0% 100%; /* Pure White (#ffffff) - Secondary line */
+  --chart-3: 0 0% 64%; /* Light Gray (#a3a3a3) - Tertiary */
+  --chart-4: 0 0% 45%; /* Medium-Light Gray (#737373) - Quaternary */
+  --chart-5: 0 0% 15%; /* Darker Gray (#262626) - Quinary */
+
+  --sidebar: 0 0% 9%; /* Dark Gray (#171717 - neutral-900) */
+  --sidebar-foreground: 0 0% 100%; /* Pure White (#ffffff) */
+  --sidebar-primary: 22 93% 53%; /* Brand Orange (#f97316 - orange-500) */
+  --sidebar-primary-foreground: 0 0% 100%; /* Pure White (#ffffff) */
+  --sidebar-accent: 0 0% 25%; /* Medium Gray (#404040 - neutral-700) */
+  --sidebar-accent-foreground: 0 0% 64%; /* Light Gray (#a3a3a3 - neutral-400) */
+  --sidebar-border: 0 0% 25%; /* Medium Gray (#404040 - neutral-700) */
+  --sidebar-ring: 22 93% 53%; /* Brand Orange (#f97316 - orange-500) */
+}
+
+@theme {
+  /* Updated to use Geist Mono as primary font for tactical aesthetic */
+  --font-sans: var(--font-geist-mono);
+  --font-mono: var(--font-geist-mono);
+
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --color-chart-1: hsl(var(--chart-1));
+  --color-chart-2: hsl(var(--chart-2));
+  --color-chart-3: hsl(var(--chart-3));
+  --color-chart-4: hsl(var(--chart-4));
+  --color-chart-5: hsl(var(--chart-5));
+
+  --radius-sm: calc(var(--radius) - 0.125rem);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 0.125rem);
+  --radius-xl: calc(var(--radius) + 0.25rem);
+
+  --color-sidebar: hsl(var(--sidebar));
+  --color-sidebar-foreground: hsl(var(--sidebar-foreground));
+  --color-sidebar-primary: hsl(var(--sidebar-primary));
+  --color-sidebar-primary-foreground: hsl(var(--sidebar-primary-foreground));
+  --color-sidebar-accent: hsl(var(--sidebar-accent));
+  --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
+  --color-sidebar-border: hsl(var(--sidebar-border));
+  --color-sidebar-ring: hsl(var(--sidebar-ring));
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground font-mono;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Updated typography hierarchy for tactical design system */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    font-weight: 700; /* Bold for tactical aesthetic */
+    font-family: var(--font-mono);
+  }
+
+  p,
+  span,
+  div {
+    line-height: 1.4;
+    font-family: var(--font-mono);
+  }
+
+  *:focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  img {
+    height: auto;
+    max-width: 100%;
+  }
+
+  button,
+  [role="button"] {
+    cursor: pointer;
+  }
+
+  button:disabled,
+  [role="button"][aria-disabled="true"] {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+@layer utilities {
+  .container-mobile {
+    @apply px-4 mx-auto max-w-screen-xl;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .text-pretty {
+    text-wrap: pretty;
+  }
+
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Updated spacing utilities for tactical grid system */
+  .space-xs {
+    gap: 0.5rem; /* 8px */
+  }
+  .space-sm {
+    gap: 0.75rem; /* 12px */
+  }
+  .space-md {
+    gap: 1rem; /* 16px */
+  }
+  .space-lg {
+    gap: 1.5rem; /* 24px */
+  }
+  .space-xl {
+    gap: 2rem; /* 32px */
+  }
+  .space-2xl {
+    gap: 3rem; /* 48px */
+  }
+
+  .container-wrapper {
+    padding: 1.5rem; /* 24px - p-6 equivalent */
+  }
+
+  .section-gap {
+    margin-bottom: 1.5rem; /* 24px - gap-6 equivalent */
+  }
+
+  .component-gap {
+    margin-bottom: 1rem; /* 16px - gap-4 equivalent */
+  }
+
+  .element-gap {
+    margin-bottom: 0.75rem; /* 12px - gap-3 equivalent */
+  }
+
+  .min-gap {
+    gap: 0.5rem; /* 8px - gap-2 equivalent */
+  }
+
+  .grid-auto-fit {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem; /* 24px - gap-6 equivalent */
+  }
+
+  .grid-auto-fill {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem; /* 24px - gap-6 equivalent */
+  }
+
+  /* Updated typography scale for tactical design system */
+  .text-xs {
+    font-size: 0.75rem; /* 12px - Body Text, Data Display, Logs */
+    line-height: 1.4;
+  }
+  .text-sm {
+    font-size: 0.875rem; /* 14px - Section Headers, Card Titles */
+    line-height: 1.4;
+  }
+  .text-base {
+    font-size: 1rem; /* 16px - Standard body text */
+    line-height: 1.4;
+  }
+  .text-lg {
+    font-size: 1.125rem; /* 18px - Main Title "TACTICAL OPS" */
+    line-height: 1.4;
+  }
+  .text-xl {
+    font-size: 1.25rem; /* 20px - Large headers */
+    line-height: 1.3;
+  }
+  .text-2xl {
+    font-size: 1.5rem; /* 24px - Large numeric values and statistics */
+    line-height: 1.2;
+  }
+  .text-3xl {
+    font-size: 1.875rem; /* 30px - Hero titles */
+    line-height: 1.2;
+  }
+  .text-4xl {
+    font-size: 2.25rem; /* 36px - Major headings */
+    line-height: 1.1;
+  }
+  .text-5xl {
+    font-size: 3rem; /* 48px - Display headings */
+    line-height: 1.1;
+  }
+
+  .container-8px {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+
+  @media (min-width: 640px) {
+    .container-8px {
+      padding: 0 1.5rem;
+    }
+  }
+
+  .aspect-responsive {
+    aspect-ratio: 16 / 9;
+  }
+
+  @media (max-width: 768px) {
+    .aspect-responsive {
+      aspect-ratio: 4 / 3;
+    }
+  }
+}
