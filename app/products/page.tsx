@@ -100,7 +100,9 @@ export default async function ProductsPage() {
         <Suspense fallback={<ProductsGridSkeleton />}>
           <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {products.map((product: any) => (
-              <ProductCard key={product.id} product={product} />
+              <div key={product.id} className="min-w-0">
+                <ProductCard key={product.id} product={product} />
+              </div>
             ))}
           </div>
         </Suspense>

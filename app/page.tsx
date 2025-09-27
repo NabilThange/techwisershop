@@ -9,11 +9,15 @@ import { ProductCard } from "@/components/product-card"
 import { YouTubeEmbed } from "@/components/youtube-embed"
 import { AccessibilitySkipLink } from "@/components/accessibility-skip-link"
 import { PerformanceMonitor } from "@/components/performance-monitor"
-import { getFeaturedProducts } from "@/data/mock-products"
+import { getFeaturedProducts, getFeaturedProduct } from "@/data/mock-products"
+import Silk from "@/components/Silk"
 
 // Add async to the component to enable server-side data fetching
 export default async function HomePage() {
-  const featuredProducts = await getFeaturedProducts()
+  const [featuredProducts, featuredProduct] = await Promise.all([
+    getFeaturedProducts(),
+    getFeaturedProduct()
+  ])
 
   return (
     <div className="min-h-screen bg-black">
@@ -25,9 +29,20 @@ export default async function HomePage() {
       <main id="main-content">
         <section className="section-gap">
           <div className="container-8px container-wrapper">
-            <Card className="relative overflow-hidden border-neutral-700 bg-neutral-900">
+            <Card className="relative overflow-hidden border-neutral-700 bg-transparent">
               <CardContent className="p-0">
-                <div className="grid gap-0 lg:grid-cols-5">
+                {/* Background */}
+                <div className="absolute inset-0 -z-10">
+                  <Silk
+                    speed={5}
+                    scale={1}
+                    color="#7B7481"
+                    noiseIntensity={1.5}
+                    rotation={0}
+                  />
+                </div>
+                
+                <div className="grid gap-0 lg:grid-cols-5 relative z-10">
                   <div className="lg:col-span-3 p-12 flex flex-col justify-center">
                     <div className="space-y-8 max-w-lg">
                       <Badge className="w-fit border border-orange-500 text-orange-500 bg-transparent hover:bg-orange-500/10 font-mono text-xs font-bold">
@@ -36,15 +51,16 @@ export default async function HomePage() {
 
                       <div className="space-y-6">
                         <h1 className="text-4xl font-bold text-balance font-mono text-white">
-                          SONY WH-1000XM5
+                          {featuredProduct?.title || "SONY WH-1000XM5"}
                           <span className="block text-orange-500">TACTICAL AUDIO</span>
                         </h1>
 
-                        <h2 className="text-xl font-bold text-white font-mono">OPERATIONAL EXCELLENCE</h2>
+                        <h2 className="text-xl font-bold text-white font-mono">
+                          {featuredProduct?.shortDescription || "OPERATIONAL EXCELLENCE"}
+                        </h2>
 
                         <p className="text-neutral-400 text-pretty max-w-md font-mono text-sm">
-                          INDUSTRY-LEADING NOISE CANCELLATION WITH EXCEPTIONAL SOUND QUALITY. MISSION-READY AUDIO FOR
-                          PROFESSIONALS AND ENTHUSIASTS.
+                          {featuredProduct?.description || "INDUSTRY-LEADING NOISE CANCELLATION WITH EXCEPTIONAL SOUND QUALITY. MISSION-READY AUDIO FOR PROFESSIONALS AND ENTHUSIASTS."}
                         </p>
                       </div>
 
@@ -53,7 +69,7 @@ export default async function HomePage() {
                           size="lg"
                           className="touch-target bg-orange-500 hover:bg-orange-500/90 font-mono text-xs font-bold"
                         >
-                          <Link href="/products/sony-wh-1000xm5" className="flex items-center gap-2">
+                          <Link href={featuredProduct ? `/products/${featuredProduct.slug}` : "/products/sony-wh-1000xm5"} className="flex items-center gap-2">
                             VIEW INTEL
                             <ArrowRight className="h-4 w-4" />
                           </Link>
@@ -90,11 +106,11 @@ export default async function HomePage() {
                     </div>
                   </div>
 
-                  <div className="lg:col-span-2 relative flex items-center justify-center p-12 min-h-[50vh] lg:min-h-[60vh] bg-neutral-900">
+                  <div className="lg:col-span-2 relative flex items-center justify-center p-12 min-h-[50vh] lg:min-h-[60vh]">
                     <div className="relative z-10 transform hover:scale-105 transition-transform duration-300">
                       <img
-                        src="https://placehold.co/600x600/171717/ffffff?text=Sony+WH-1000XM5"
-                        alt="Sony WH-1000XM5 Premium Headphones"
+                        src={featuredProduct?.image || "/sony-wh-1000xm5-headphones-blue-premium-wireless.jpg"}
+                        alt={featuredProduct?.title || "Sony WH-1000XM5 Premium Headphones"}
                         className="w-full max-w-sm h-auto object-contain drop-shadow-lg"
                         loading="eager"
                       />
@@ -146,8 +162,10 @@ export default async function HomePage() {
             </div>
 
             <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {featuredProducts.map((product, index) => (
-                <ProductCard key={product.id} product={product} priority={index === 0} />
+              {featuredProducts.map((product: any, index: number) => (
+                <div key={product.id} className="min-w-0">
+                  <ProductCard product={product} priority={index === 0} />
+                </div>
               ))}
             </div>
 

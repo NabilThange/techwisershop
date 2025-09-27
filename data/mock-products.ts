@@ -84,6 +84,54 @@ export async function getFeaturedProducts() {
   }))
 }
 
+// New function to fetch the latest featured product for the Hero section
+export async function getFeaturedProduct() {
+  const { data, error } = await supabase
+    .from('products')
+    .select(`
+      *,
+      categories (name),
+      brands (name)
+    `)
+    .eq('featured', true)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .single()
+
+  if (error) {
+    console.error('Error fetching featured product:', error)
+    return null
+  }
+
+  // Transform the data to match the expected format
+  return {
+    id: data.id,
+    slug: data.slug,
+    title: data.title,
+    price: data.price,
+    originalPrice: data.original_price,
+    currency: data.currency,
+    image: data.main_image_url,
+    images: [data.main_image_url],
+    amazonLink: data.amazon_link,
+    flipkartLink: data.flipkart_link,
+    rating: data.rating,
+    reviewCount: data.review_count,
+    shortDescription: data.short_description,
+    description: data.description,
+    category: data.categories?.name || data.category,
+    brand: data.brands?.name || data.brand,
+    specs: {},
+    pros: [],
+    cons: [],
+    youtubeVideoId: data.youtube_video_id,
+    inStock: data.in_stock,
+    featured: data.featured,
+    tags: data.tags || [],
+    createdAt: data.created_at
+  }
+}
+
 // Updated function to fetch a single product by slug
 export async function getProductBySlug(slug: string) {
   const { data, error } = await supabase

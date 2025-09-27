@@ -1,5 +1,5 @@
 import type React from "react"
-import type { Metadata, Viewport } from "next"
+import type { Metadata } from "next"
 import { GeistSans } from "geist/font/sans"
 import { GeistMono } from "geist/font/mono"
 import { Analytics } from "@vercel/analytics/next"
@@ -79,6 +79,8 @@ export const metadata: Metadata = {
     canonical: "https://techwiser.shop",
   },
   category: "technology",
+  themeColor: "#000000",
+  viewport: "width=device-width, initial-scale=1, viewport-fit=cover",
   other: {
     "preconnect-fonts": "https://fonts.googleapis.com",
     "preconnect-gstatic": "https://fonts.gstatic.com",
@@ -86,13 +88,6 @@ export const metadata: Metadata = {
     "preconnect-ytimg": "https://i.ytimg.com",
   },
   generator: "v0.app",
-}
-
-export const viewport: Viewport = {
-  themeColor: "#000000",
-  width: "device-width",
-  initialScale: 1,
-  viewportFit: "cover",
 }
 
 export default function RootLayout({
