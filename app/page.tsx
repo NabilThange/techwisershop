@@ -20,114 +20,115 @@ export default async function HomePage() {
   ])
 
   return (
-    <div className="min-h-screen bg-black">
-      <AccessibilitySkipLink />
-      <PerformanceMonitor />
+    <div className="relative min-h-screen bg-black">
+      {/* Full-bleed subtle Silk background for the hero viewport only */}
+      <div className="absolute left-0 right-0 top-0 h-[100svh] z-0 pointer-events-none">
+        <Silk
+          speed={5}
+          scale={1}
+          color="#161617"
+          noiseIntensity={0.5}
+          rotation={0.1}
+        />
+      </div>
 
-      <Navbar />
+      <div className="relative z-10">
+        <AccessibilitySkipLink />
+        <PerformanceMonitor />
 
-      <main id="main-content">
+        <Navbar />
+
+        <main id="main-content">
         <section className="section-gap">
           <div className="container-8px container-wrapper">
-            <Card className="relative overflow-hidden border-neutral-700 bg-transparent">
-              <CardContent className="p-0">
-                {/* Background */}
-                <div className="absolute inset-0 -z-10">
-                  <Silk
-                    speed={5}
-                    scale={1}
-                    color="#7B7481"
-                    noiseIntensity={1.5}
-                    rotation={0}
-                  />
-                </div>
-                
-                <div className="grid gap-0 lg:grid-cols-5 relative z-10">
-                  <div className="lg:col-span-3 p-12 flex flex-col justify-center">
-                    <div className="space-y-8 max-w-lg">
-                      <Badge className="w-fit border border-orange-500 text-orange-500 bg-transparent hover:bg-orange-500/10 font-mono text-xs font-bold">
-                        MISSION CRITICAL
-                      </Badge>
+            <Card className="relative z-10 overflow-hidden border-neutral-700 bg-neutral-900">
+                <CardContent className="p-0">
+                  <div className="grid gap-0 lg:grid-cols-5 relative z-10">
+                    <div className="lg:col-span-3 p-12 flex flex-col justify-center">
+                      <div className="space-y-8 max-w-lg">
+                        <Badge className="w-fit border border-orange-500 text-orange-500 bg-transparent hover:bg-orange-500/10 font-mono text-xs font-bold">
+                          MISSION CRITICAL
+                        </Badge>
 
-                      <div className="space-y-6">
-                        <h1 className="text-4xl font-bold text-balance font-mono text-white">
-                          {featuredProduct?.title || "SONY WH-1000XM5"}
-                          <span className="block text-orange-500">TACTICAL AUDIO</span>
-                        </h1>
+                        <div className="space-y-6">
+                          <h1 className="text-4xl font-bold text-balance font-mono text-white">
+                            {featuredProduct?.title || "SONY WH-1000XM5"}
+                            <span className="block text-orange-500">TACTICAL AUDIO</span>
+                          </h1>
 
-                        <h2 className="text-xl font-bold text-white font-mono">
-                          {featuredProduct?.shortDescription || "OPERATIONAL EXCELLENCE"}
-                        </h2>
+                          <h2 className="text-xl font-bold text-white font-mono">
+                            {featuredProduct?.shortDescription || "OPERATIONAL EXCELLENCE"}
+                          </h2>
 
-                        <p className="text-neutral-400 text-pretty max-w-md font-mono text-sm">
-                          {featuredProduct?.description || "INDUSTRY-LEADING NOISE CANCELLATION WITH EXCEPTIONAL SOUND QUALITY. MISSION-READY AUDIO FOR PROFESSIONALS AND ENTHUSIASTS."}
-                        </p>
-                      </div>
+                          <p className="text-neutral-400 text-pretty max-w-md font-mono text-sm">
+                            {featuredProduct?.description || "INDUSTRY-LEADING NOISE CANCELLATION WITH EXCEPTIONAL SOUND QUALITY. MISSION-READY AUDIO FOR PROFESSIONALS AND ENTHUSIASTS."}
+                          </p>
+                        </div>
 
-                      <div className="flex flex-col sm:flex-row gap-4 pt-6">
-                        <Button
-                          size="lg"
-                          className="touch-target bg-orange-500 hover:bg-orange-500/90 font-mono text-xs font-bold"
-                        >
-                          <Link href={featuredProduct ? `/products/${featuredProduct.slug}` : "/products/sony-wh-1000xm5"} className="flex items-center gap-2">
-                            VIEW INTEL
-                            <ArrowRight className="h-4 w-4" />
-                          </Link>
-                        </Button>
-
-                        <Button
-                          size="lg"
-                          variant="outline"
-                          className="touch-target bg-transparent border-neutral-700 text-neutral-400 hover:bg-neutral-800 hover:text-white font-mono text-xs font-bold"
-                        >
-                          <a
-                            href="https://youtube.com/@TECHWISER"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-2"
+                        <div className="flex flex-col sm:flex-row gap-4 pt-6">
+                          <Button
+                            size="lg"
+                            className="touch-target bg-orange-500 hover:bg-orange-500/90 font-mono text-xs font-bold"
                           >
-                            <Play className="h-4 w-4" />
-                            WATCH BRIEFING
-                          </a>
-                        </Button>
-                      </div>
+                            <Link href={featuredProduct ? `/products/${featuredProduct.slug}` : "/products/sony-wh-1000xm5"} className="flex items-center gap-2">
+                              VIEW INTEL
+                              <ArrowRight className="h-4 w-4" />
+                            </Link>
+                          </Button>
 
-                      <div className="flex items-center gap-6 pt-8 text-xs text-neutral-400 font-mono">
-                        <span>FOLLOW TACTICAL OPS:</span>
-                        <div className="flex items-center gap-4">
-                          <a href="#" className="hover:text-orange-500 transition-colors">
-                            <Youtube className="h-4 w-4" />
-                          </a>
-                          <a href="#" className="hover:text-orange-500 transition-colors">
-                            <Star className="h-4 w-4" />
-                          </a>
+                          <Button
+                            size="lg"
+                            variant="outline"
+                            className="touch-target bg-transparent border-neutral-700 text-neutral-400 hover:bg-neutral-800 hover:text-white font-mono text-xs font-bold"
+                          >
+                            <a
+                              href="https://youtube.com/@TECHWISER"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-2"
+                            >
+                              <Play className="h-4 w-4" />
+                              WATCH BRIEFING
+                            </a>
+                          </Button>
+                        </div>
+
+                        <div className="flex items-center gap-6 pt-8 text-xs text-neutral-400 font-mono">
+                          <span>FOLLOW TACTICAL OPS:</span>
+                          <div className="flex items-center gap-4">
+                            <a href="#" className="hover:text-orange-500 transition-colors">
+                              <Youtube className="h-4 w-4" />
+                            </a>
+                            <a href="#" className="hover:text-orange-500 transition-colors">
+                              <Star className="h-4 w-4" />
+                            </a>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
 
-                  <div className="lg:col-span-2 relative flex items-center justify-center p-12 min-h-[50vh] lg:min-h-[60vh]">
-                    <div className="relative z-10 transform hover:scale-105 transition-transform duration-300">
-                      <img
-                        src={featuredProduct?.image || "/sony-wh-1000xm5-headphones-blue-premium-wireless.jpg"}
-                        alt={featuredProduct?.title || "Sony WH-1000XM5 Premium Headphones"}
-                        className="w-full max-w-sm h-auto object-contain drop-shadow-lg"
-                        loading="eager"
-                      />
+                    <div className="lg:col-span-2 relative flex items-center justify-center p-12 min-h-[50vh] lg:min-h-[60vh]">
+                      <div className="relative z-10 transform hover:scale-105 transition-transform duration-300">
+                        <img
+                          src={featuredProduct?.image || "/sony-wh-1000xm5-headphones-blue-premium-wireless.jpg"}
+                          alt={featuredProduct?.title || "Sony WH-1000XM5 Premium Headphones"}
+                          className="w-full max-w-sm h-auto object-contain drop-shadow-lg"
+                          loading="eager"
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="absolute left-3 top-3 z-20 flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4 text-orange-500" />
-                  <Badge
-                    variant="outline"
-                    className="border-white/80 bg-black/50 text-white font-mono text-xs font-bold backdrop-blur-[2px]"
-                  >
-                    FEATURED
-                  </Badge>
-                </div>
-              </CardContent>
-            </Card>
+                  <div className="absolute left-3 top-3 z-20 flex items-center gap-2">
+                    <TrendingUp className="h-4 w-4 text-orange-500" />
+                    <Badge
+                      variant="outline"
+                      className="border-white/80 bg-black/50 text-white font-mono text-xs font-bold backdrop-blur-[2px]"
+                    >
+                      FEATURED
+                    </Badge>
+                  </div>
+                </CardContent>
+              </Card>
           </div>
         </section>
 
@@ -261,5 +262,6 @@ export default async function HomePage() {
 
       <Footer />
     </div>
+  </div>
   )
 }

@@ -280,6 +280,91 @@ export async function getAllProducts() {
   }))
 }
 
+// Flexible products fetch with filters and sorting
+export type ProductQueryOptions = {
+  category?: string
+  sort?: 'newest' | 'price-low' | 'price-high' | 'rating'
+  minPrice?: number
+  maxPrice?: number
+  inStock?: boolean
+}
+
+export async function getProducts(options: ProductQueryOptions = {}) {
+  const { category, sort = 'newest', minPrice, maxPrice, inStock } = options
+
+  let query = supabase
+    .from('products')
+    .select(`
+      *,
+      categories (name),
+      brands (name),
+      product_images (image_url)
+    `)
+
+  if (category) {
+    query = query.eq('categories.name', category)
+  }
+  if (typeof minPrice === 'number') {
+    query = query.gte('price', minPrice)
+  }
+  if (typeof maxPrice === 'number') {
+    query = query.lte('price', maxPrice)
+  }
+  if (inStock) {
+    query = query.eq('in_stock', true)
+  }
+
+  switch (sort) {
+    case 'price-low':
+      query = query.order('price', { ascending: true, nullsFirst: false })
+      break
+    case 'price-high':
+      query = query.order('price', { ascending: false, nullsFirst: false })
+      break
+    case 'rating':
+      query = query.order('rating', { ascending: false, nullsFirst: false })
+      break
+    case 'newest':
+    default:
+      query = query.order('created_at', { ascending: false, nullsFirst: false })
+      break
+  }
+
+  const { data, error } = await query
+
+  if (error) {
+    console.error('Error fetching products with filters:', error)
+    return []
+  }
+
+  return data.map((product: any) => ({
+    id: product.id,
+    slug: product.slug,
+    title: product.title,
+    price: product.price,
+    originalPrice: product.original_price,
+    currency: product.currency,
+    image: product.main_image_url,
+    images: product.product_images?.map((img: any) => img.image_url) || [product.main_image_url],
+    amazonLink: product.amazon_link,
+    flipkartLink: product.flipkart_link,
+    rating: product.rating,
+    reviewCount: product.review_count,
+    shortDescription: product.short_description,
+    description: product.description,
+    category: product.categories?.name || product.category,
+    brand: product.brands?.name || product.brand,
+    specs: {},
+    pros: [],
+    cons: [],
+    youtubeVideoId: product.youtube_video_id,
+    inStock: product.in_stock,
+    featured: product.featured,
+    tags: product.tags || [],
+    createdAt: product.created_at
+  }))
+}
+
 // Updated function to fetch categories
 export async function getCategories() {
   const { data, error } = await supabase

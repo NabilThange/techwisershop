@@ -207,15 +207,68 @@
     max-width: 100%;
   }
 
+  /* Global cursor pointer styles for all interactive elements */
   button,
-  [role="button"] {
+  [role="button"],
+  a,
+  [role="link"],
+  [role="tab"],
+  [role="menuitem"],
+  [role="option"],
+  [role="switch"],
+  [role="checkbox"],
+  [role="radio"],
+  input[type="button"],
+  input[type="submit"],
+  input[type="reset"],
+  input[type="checkbox"],
+  input[type="radio"],
+  input[type="file"],
+  select,
+  textarea:not([readonly]),
+  input:not([type="text"]):not([type="email"]):not([type="password"]):not([type="number"]):not([type="search"]):not([type="url"]):not([type="tel"]):not([disabled]),
+  label[for],
+  summary,
+  [tabindex="0"],
+  [tabindex="-1"],
+  [onclick],
+  [data-clickable],
+  .cursor-pointer {
     cursor: pointer;
   }
 
+  /* Card and interactive container elements */
+  [data-slot="card"]:hover,
+  .group:hover,
+  [role="article"] a,
+  [role="listitem"] a,
+  .card:hover,
+  .clickable,
+  .interactive {
+    cursor: pointer;
+  }
+
+  /* Disabled states */
   button:disabled,
-  [role="button"][aria-disabled="true"] {
+  [role="button"][aria-disabled="true"],
+  input:disabled,
+  select:disabled,
+  textarea:disabled,
+  [aria-disabled="true"] {
     cursor: not-allowed;
     opacity: 0.6;
+  }
+
+  /* Text input elements should keep text cursor */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="search"],
+  input[type="url"],
+  input[type="tel"],
+  textarea {
+    cursor: text;
   }
 }
 
@@ -348,5 +401,34 @@
     .aspect-responsive {
       aspect-ratio: 4 / 3;
     }
+  }
+
+  /* Cursor utility classes */
+  .cursor-pointer {
+    cursor: pointer !important;
+  }
+
+  .cursor-hand {
+    cursor: pointer !important;
+  }
+
+  .cursor-clickable {
+    cursor: pointer !important;
+  }
+
+  .cursor-interactive {
+    cursor: pointer !important;
+  }
+
+  .cursor-disabled {
+    cursor: not-allowed !important;
+  }
+
+  .cursor-text {
+    cursor: text !important;
+  }
+
+  .cursor-default {
+    cursor: default !important;
   }
 }

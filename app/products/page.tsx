@@ -1,18 +1,23 @@
-import { Suspense } from "react"
+import Link from "next/link"
 import { Filter, Grid, List, SortAsc, Search, TrendingUp } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
-import { ProductCard } from "@/components/product-card"
-import { getAllProducts, getCategories } from "@/data/mock-products"
 import { Input } from "@/components/ui/input"
+import { ProductsPageClient } from "./ProductsPageClient"
 
-export default async function ProductsPage() {
-  const products = await getAllProducts()
-  const categories = await getCategories()
+type ProductsSearchParams = {
+  category?: string
+  sort?: 'newest' | 'price-low' | 'price-high' | 'rating'
+  min?: string
+  max?: string
+  inStock?: string
+  view?: 'grid' | 'list'
+}
 
+export default function ProductsPage() {
   return (
     <div className="min-h-screen bg-black">
       <Navbar />
@@ -43,80 +48,8 @@ export default async function ProductsPage() {
           </div>
         </div>
 
-        {/* Filters and Sort */}
-        <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div className="flex flex-wrap gap-2">
-            <Badge className="cursor-pointer bg-orange-500 text-white hover:bg-orange-500/90 font-mono text-xs font-bold">
-              ALL CATEGORIES
-            </Badge>
-            {categories.map((category: any) => (
-              <Badge
-                key={category.id}
-                variant="outline"
-                className="cursor-pointer border-neutral-700 text-neutral-400 hover:bg-neutral-800 hover:text-white font-mono text-xs font-bold"
-              >
-                {category.name.toUpperCase()}
-              </Badge>
-            ))}
-          </div>
-
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              className="bg-transparent border-neutral-700 text-neutral-400 hover:bg-neutral-800 hover:text-white font-mono text-xs font-bold"
-            >
-              <Filter className="mr-2 h-4 w-4" />
-              FILTER
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="bg-transparent border-neutral-700 text-neutral-400 hover:bg-neutral-800 hover:text-white font-mono text-xs font-bold"
-            >
-              <SortAsc className="mr-2 h-4 w-4" />
-              SORT
-            </Button>
-            <div className="flex rounded-md border border-neutral-700">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="rounded-r-none text-neutral-400 hover:text-white hover:bg-neutral-800"
-              >
-                <Grid className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="rounded-l-none text-neutral-400 hover:text-white hover:bg-neutral-800"
-              >
-                <List className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        {/* Products Grid */}
-        <Suspense fallback={<ProductsGridSkeleton />}>
-          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {products.map((product: any) => (
-              <div key={product.id} className="min-w-0">
-                <ProductCard key={product.id} product={product} />
-              </div>
-            ))}
-          </div>
-        </Suspense>
-
-        {/* Load More */}
-        <div className="mt-12 text-center">
-          <Button
-            variant="outline"
-            size="lg"
-            className="bg-transparent border-neutral-700 text-neutral-400 hover:bg-neutral-800 hover:text-white font-mono text-xs font-bold"
-          >
-            LOAD MORE TACTICAL GEAR
-          </Button>
-        </div>
+        {/* Client-only controls and results */}
+        <ProductsPageClient />
       </main>
 
       <Footer />
@@ -124,21 +57,5 @@ export default async function ProductsPage() {
   )
 }
 
-function ProductsGridSkeleton() {
-  return (
-    <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      {[...Array(8)].map((_, i) => (
-        <Card key={i} className="overflow-hidden bg-neutral-900 border-neutral-700">
-          <div className="aspect-square bg-neutral-800 animate-pulse" />
-          <CardContent className="p-4">
-            <div className="space-y-2">
-              <div className="h-4 bg-neutral-800 rounded animate-pulse" />
-              <div className="h-4 bg-neutral-800 rounded w-3/4 animate-pulse" />
-              <div className="h-6 bg-neutral-800 rounded w-1/2 animate-pulse" />
-            </div>
-          </CardContent>
-        </Card>
-      ))}
-    </div>
-  )
-}
+
+

@@ -15,7 +15,7 @@ const hexToNormalizedRGB = (hex: string): NormalizedRGB => {
   return [r, g, b];
 };
 
-interface UniformValue<T = number | typeof THREE.Color> {
+interface UniformValue<T = number | THREE.Color> {
   value: T;
 }
 
@@ -23,10 +23,10 @@ interface SilkUniforms {
   uSpeed: UniformValue<number>;
   uScale: UniformValue<number>;
   uNoiseIntensity: UniformValue<number>;
-  uColor: UniformValue<typeof THREE.Color>;
+  uColor: UniformValue<THREE.Color>;
   uRotation: UniformValue<number>;
   uTime: UniformValue<number>;
-  [uniform: string]: typeof THREE.IUniform;
+  [uniform: string]: THREE.IUniform;
 }
 
 const vertexShader = `
@@ -90,20 +90,20 @@ interface SilkPlaneProps {
   uniforms: SilkUniforms;
 }
 
-const SilkPlane = forwardRef<typeof THREE.Mesh, SilkPlaneProps>(function SilkPlane({ uniforms }, ref) {
+const SilkPlane = forwardRef<THREE.Mesh, SilkPlaneProps>(function SilkPlane({ uniforms }, ref) {
   const { viewport } = useThree();
 
   useLayoutEffect(() => {
-    const mesh = ref as React.MutableRefObject<typeof THREE.Mesh | null>;
+    const mesh = ref as React.MutableRefObject<THREE.Mesh | null>;
     if (mesh.current) {
       mesh.current.scale.set(viewport.width, viewport.height, 1);
     }
   }, [ref, viewport]);
 
   useFrame((_state: RootState, delta: number) => {
-    const mesh = ref as React.MutableRefObject<typeof THREE.Mesh | null>;
+    const mesh = ref as React.MutableRefObject<THREE.Mesh | null>;
     if (mesh.current) {
-      const material = mesh.current.material as typeof THREE.ShaderMaterial & {
+      const material = mesh.current.material as THREE.ShaderMaterial & {
         uniforms: SilkUniforms;
       };
       material.uniforms.uTime.value += 0.1 * delta;
@@ -131,7 +131,7 @@ export interface SilkProps {
 }
 
 const Silk: React.FC<SilkProps> = ({ speed = 5, scale = 1, color = '#7B7481', noiseIntensity = 1.5, rotation = 0 }) => {
-  const meshRef = useRef<typeof THREE.Mesh>(null);
+  const meshRef = useRef<THREE.Mesh>(null);
 
   const uniforms = useMemo<SilkUniforms>(
     () => ({
@@ -146,7 +146,13 @@ const Silk: React.FC<SilkProps> = ({ speed = 5, scale = 1, color = '#7B7481', no
   );
 
   return (
-    <Canvas dpr={[1, 2]} frameloop="always">
+    <Canvas
+      dpr={[1, 2]}
+      frameloop="always"
+      gl={{ alpha: true, antialias: true }}
+      style={{ width: '100%', height: '100%', pointerEvents: 'none' }}
+      className="w-full h-full"
+    >
       <SilkPlane ref={meshRef} uniforms={uniforms} />
     </Canvas>
   );
