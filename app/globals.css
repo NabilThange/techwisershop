@@ -140,8 +140,21 @@
   * {
     @apply border-border outline-ring/50;
   }
+  
+  /* Lenis smooth scroll setup */
+  html {
+    scroll-behavior: auto; /* Disable browser smooth scroll */
+  }
+  
+  /* Hide scrollbar for a cleaner look */
   body {
     @apply bg-background text-foreground font-mono;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
+  }
+  
+  body::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
   }
 
   html {

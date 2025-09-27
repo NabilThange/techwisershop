@@ -1,5 +1,5 @@
 import type React from "react"
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
 import { GeistSans } from "geist/font/sans"
 import { GeistMono } from "geist/font/mono"
 import { Analytics } from "@vercel/analytics/next"
@@ -9,6 +9,8 @@ import { Suspense } from "react"
 import { StructuredData } from "@/components/structured-data"
 import { ThemeProvider } from "@/components/theme-provider"
 import { ScrollToTop } from "@/components/scroll-to-top"
+import { LenisProvider } from "@/components/lenis-provider"
+import { ScrollToSection } from "@/components/scroll-to-section"
 
 export const metadata: Metadata = {
   title: {
@@ -77,8 +79,6 @@ export const metadata: Metadata = {
     canonical: "https://techwiser.shop",
   },
   category: "technology",
-  themeColor: "#000000",
-  viewport: "width=device-width, initial-scale=1, viewport-fit=cover",
   other: {
     "preconnect-fonts": "https://fonts.googleapis.com",
     "preconnect-gstatic": "https://fonts.gstatic.com",
@@ -86,6 +86,13 @@ export const metadata: Metadata = {
     "preconnect-ytimg": "https://i.ytimg.com",
   },
   generator: "v0.app",
+}
+
+export const viewport: Viewport = {
+  themeColor: "#000000",
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 }
 
 export default function RootLayout({
@@ -105,14 +112,17 @@ export default function RootLayout({
         } as React.CSSProperties}
       >
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
-          <StructuredData type="organization" data={{}} />
-          <StructuredData type="website" data={{}} />
-          <ScrollToTop />
-          <Suspense>
-            {children}
-            <Analytics />
-            <SpeedInsights />
-          </Suspense>
+          <LenisProvider>
+            <StructuredData type="organization" data={{}} />
+            <StructuredData type="website" data={{}} />
+            <ScrollToTop />
+            <ScrollToSection />
+            <Suspense>
+              {children}
+              <Analytics />
+              <SpeedInsights />
+            </Suspense>
+          </LenisProvider>
         </ThemeProvider>
       </body>
     </html>

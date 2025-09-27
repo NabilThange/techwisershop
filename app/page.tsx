@@ -93,7 +93,7 @@ export default async function HomePage() {
                   <div className="lg:col-span-2 relative flex items-center justify-center p-12 min-h-[50vh] lg:min-h-[60vh] bg-neutral-900">
                     <div className="relative z-10 transform hover:scale-105 transition-transform duration-300">
                       <img
-                        src="/sony-wh-1000xm5-headphones-blue-premium-wireless.jpg"
+                        src="https://placehold.co/600x600/171717/ffffff?text=Sony+WH-1000XM5"
                         alt="Sony WH-1000XM5 Premium Headphones"
                         className="w-full max-w-sm h-auto object-contain drop-shadow-lg"
                         loading="eager"
