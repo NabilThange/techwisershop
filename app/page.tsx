@@ -10,8 +10,8 @@ import { YouTubeEmbed } from "@/components/youtube-embed"
 import { AccessibilitySkipLink } from "@/components/accessibility-skip-link"
 import { PerformanceMonitor } from "@/components/performance-monitor"
 import { getFeaturedProducts, getFeaturedProduct } from "@/data/mock-products"
-import Silk from "@/components/Silk"
-
+// import Silk from "@/components/Silk"
+import DarkVeil from "@/components/DarkVeil"
 // Add async to the component to enable server-side data fetching
 export default async function HomePage() {
   const [featuredProducts, featuredProduct] = await Promise.all([
@@ -23,13 +23,7 @@ export default async function HomePage() {
     <div className="relative min-h-screen bg-black">
       {/* Full-bleed subtle Silk background for the hero viewport only */}
       <div className="absolute left-0 right-0 top-0 h-[100svh] z-0 pointer-events-none">
-        <Silk
-          speed={5}
-          scale={1}
-          color="#161617"
-          noiseIntensity={0.5}
-          rotation={0.1}
-        />
+        <DarkVeil />
       </div>
 
       <div className="relative z-10">

@@ -16,27 +16,41 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
     // Increment reference count
     lenisRefCount++
     
+    // Check if device is mobile/touch device
+    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0
+    
     // Initialize Lenis with subtle smooth scrolling only if not already initialized
     if (!globalLenis) {
-      globalLenis = new Lenis({
-        autoRaf: true,
-        lerp: 0.08, // Subtle smoothness (default is 0.1)
-        wheelMultiplier: 0.9, // Slightly slower scroll speed
-        touchMultiplier: 0.9,
-        syncTouch: true, // Better mobile experience
-        syncTouchLerp: 0.075,
-        touchInertiaExponent: 1.5,
-        gestureOrientation: 'vertical',
-        orientation: 'vertical',
-      })
+      if (isTouchDevice) {
+        // On mobile: Use native scrolling for better performance
+        globalLenis = new Lenis({
+          autoRaf: true,
+          lerp: 0.1,
+          wheelMultiplier: 1,
+          touchMultiplier: 2, // Increased for easier mobile scrolling
+          syncTouch: false, // Disable smooth scrolling on touch - use native
+          touchInertiaMultiplier: 35, // More natural mobile inertia
+          gestureOrientation: 'vertical',
+          orientation: 'vertical',
+          infinite: false,
+        })
+      } else {
+        // On desktop: Smooth scrolling experience
+        globalLenis = new Lenis({
+          autoRaf: true,
+          lerp: 0.08, // Subtle smoothness
+          wheelMultiplier: 0.9, // Slightly slower scroll speed
+          touchMultiplier: 0.9,
+          syncTouch: true,
+          syncTouchLerp: 0.075,
+          touchInertiaMultiplier: 35,
+          gestureOrientation: 'vertical',
+          orientation: 'vertical',
+        })
+      }
     }
 
     lenisRef.current = globalLenis
-
-    // Optional: Log scroll events (remove in production)
-    // globalLenis.on('scroll', (e) => {
-    //   console.log('Scrolling:', e.scroll)
-    // })
 
     // Cleanup function - only destroy if this is the last instance
     return () => {

@@ -48,7 +48,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_IN",
-    url: "https://techwiser.shop",
+    url: "https://techwiser.vercel.app",
     siteName: "TECHWISER",
     title: "TECHWISER - Tech Product Reviews & Recommendations",
     description:
@@ -87,7 +87,7 @@ export const metadata: Metadata = {
     "preconnect-youtube": "https://www.youtube.com",
     "preconnect-ytimg": "https://i.ytimg.com",
   },
-  generator: "v0.app",
+  generator: "Nabil",
 }
 
 export default function RootLayout({
