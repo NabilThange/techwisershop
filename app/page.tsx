@@ -130,15 +130,15 @@ export default async function HomePage() {
           <div className="container-8px container-wrapper">
             <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-3">
               <div className="text-center">
-                <div className="mb-3 text-3xl font-bold text-orange-500 font-mono">500K+</div>
+                <div className="mb-3 text-3xl font-bold text-orange-500 font-mono">2.53+</div>
                 <div className="text-xs text-neutral-400 font-mono">YOUTUBE SUBSCRIBERS</div>
               </div>
               <div className="text-center">
-                <div className="mb-3 text-3xl font-bold text-orange-500 font-mono">1000+</div>
+                <div className="mb-3 text-3xl font-bold text-orange-500 font-mono">1613+</div>
                 <div className="text-xs text-neutral-400 font-mono">PRODUCTS REVIEWED</div>
               </div>
               <div className="text-center sm:col-span-2 lg:col-span-1">
-                <div className="mb-3 text-3xl font-bold text-orange-500 font-mono">50M+</div>
+                <div className="mb-3 text-3xl font-bold text-orange-500 font-mono">915M+</div>
                 <div className="text-xs text-neutral-400 font-mono">VIEWS ON REVIEWS</div>
               </div>
             </div>
