@@ -51,7 +51,7 @@ export default async function HomePage() {
                           </h1>
 
                           <h2 className="text-xl font-bold text-white font-mono">
-                            {featuredProduct?.shortDescription || "OPERATIONAL EXCELLENCE"}
+                            {featuredProduct?.short_description || "OPERATIONAL EXCELLENCE"}
                           </h2>
 
                           <p className="text-neutral-400 text-pretty max-w-md font-mono text-sm">
@@ -104,7 +104,7 @@ export default async function HomePage() {
                     <div className="lg:col-span-2 relative flex items-center justify-center p-12 min-h-[50vh] lg:min-h-[60vh]">
                       <div className="relative z-10 transform hover:scale-105 transition-transform duration-300">
                         <img
-                          src={featuredProduct?.image || "/sony-wh-1000xm5-headphones-blue-premium-wireless.jpg"}
+                          src={featuredProduct?.main_image_url || "/sony-wh-1000xm5-headphones-blue-premium-wireless.jpg"}
                           alt={featuredProduct?.title || "Sony WH-1000XM5 Premium Headphones"}
                           className="w-full max-w-sm h-auto object-contain drop-shadow-lg"
                           loading="eager"

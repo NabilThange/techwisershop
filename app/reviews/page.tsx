@@ -18,10 +18,10 @@ export default async function ReviewsPage() {
     publishDate: new Date(2025, 0, 15 - index).toISOString(),
     readTime: Math.floor(Math.random() * 5) + 3,
     rating: product.rating,
-    category: product.category,
+    category: product.category?.name || 'Tech',
     slug: product.slug,
-    image: product.image,
-    videoId: product.youtubeVideoId,
+    image: product.main_image_url,
+    videoId: product.youtube_video_id,
   }))
 
   return (
