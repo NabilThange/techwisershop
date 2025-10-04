@@ -4,10 +4,12 @@ import { Footer } from "@/components/footer"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { getCategories, getAllProducts } from "@/data/mock-products"
+import { getProducts } from "@/lib/supabase-client"
+import { Category, ProductWithCategory } from "@/types/database"
 
 export default async function CategoriesPage() {
-  const categories = await getCategories()
-  const products = await getAllProducts()
+  const { data: categories } = await getCategories()
+  const { data: products } = await getProducts({ is_published: true })
 
   return (
     <div className="min-h-screen bg-background">
@@ -20,9 +22,9 @@ export default async function CategoriesPage() {
         </div>
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {categories.map((category: any) => {
-            const categoryProducts = products.filter(
-              (p: any) => p.category.toLowerCase() === category.name.toLowerCase(),
+          {(categories || []).map((category) => {
+            const categoryProducts = (products || []).filter(
+              (p) => p.category_id === category.id
             )
 
             return (
@@ -34,7 +36,7 @@ export default async function CategoriesPage() {
                       <Badge variant="secondary">{categoryProducts.length} products</Badge>
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      Discover the best {category.name.toLowerCase()} products with detailed reviews and comparisons
+                      {category.description || `Discover the best ${category.name.toLowerCase()} products with detailed reviews and comparisons`}
                     </p>
                   </CardContent>
                 </Card>

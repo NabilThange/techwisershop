@@ -10,7 +10,8 @@ import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { ProductCard } from "@/components/product-card"
 import { SearchBar } from "@/components/search-bar"
-import { supabase } from '@/lib/supabase-client'
+import { searchProducts, getCategories } from '@/lib/supabase-client'
+import { ProductWithCategory, Category } from '@/types/database'
 
 interface SearchPageProps {
   searchParams: {
@@ -27,8 +28,8 @@ export function SearchPageClient() {
   const category = searchParams.get("category")
   const sort = searchParams.get("sort") || "relevance"
   
-  const [filteredProducts, setFilteredProducts] = useState<any[]>([])
-  const [categories, setCategories] = useState<any[]>([])
+  const [filteredProducts, setFilteredProducts] = useState<ProductWithCategory[]>([])
+  const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -39,77 +40,46 @@ export function SearchPageClient() {
     const fetchSearchResults = async () => {
       setLoading(true)
       
-      // Fetch products based on search query
-      let queryBuilder = supabase
-        .from('products')
-        .select(`
-          *,
-          categories (name),
-          brands (name),
-          product_images (image_url)
-        `)
-      
-      // Apply search filters
-      if (query) {
-        queryBuilder = queryBuilder.or(
-          `title.ilike.%${query}%,brand.ilike.%${query}%,categories.name.ilike.%${query}%,description.ilike.%${query}%`
-        )
-      }
-      
-      if (category) {
-        queryBuilder = queryBuilder.eq('categories.name', category)
-      }
-      
-      const { data, error } = await queryBuilder
-      
-      if (error) {
-        console.error('Error fetching search results:', error)
-      } else {
-        // Transform data to match expected format
-        const transformedProducts = data?.map((product: any) => ({
-          id: product.id,
-          slug: product.slug,
-          title: product.title,
-          price: product.price,
-          originalPrice: product.original_price,
-          currency: product.currency,
-          image: product.main_image_url,
-          images: product.product_images?.map((img: any) => img.image_url) || [product.main_image_url],
-          amazonLink: product.amazon_link,
-          flipkartLink: product.flipkart_link,
-          rating: product.rating,
-          reviewCount: product.review_count,
-          shortDescription: product.short_description,
-          description: product.description,
-          category: product.categories?.name || product.category,
-          brand: product.brands?.name || product.brand,
-          specs: {},
-          pros: [],
-          cons: [],
-          youtubeVideoId: product.youtube_video_id,
-          inStock: product.in_stock,
-          featured: product.featured,
-          tags: product.tags || [],
-          createdAt: product.created_at
-        })) || []
+      try {
+        // Get category ID if category filter is set
+        let categoryId: string | undefined
+        if (category) {
+          const { data: categoriesData } = await getCategories()
+          const categoryMatch = (categoriesData || []).find(
+            (cat) => cat.slug === category || cat.name.toLowerCase() === category.toLowerCase()
+          )
+          categoryId = categoryMatch?.id
+        }
         
-        setFilteredProducts(transformedProducts)
-      }
-      
-      // Fetch categories
-      const { data: categoriesData, error: categoriesError } = await supabase
-        .from('categories')
-        .select('*')
-      
-      if (!categoriesError) {
-        setCategories(categoriesData || [])
+        // Search products
+        const { data: searchData, error: searchError } = await searchProducts(query, {
+          category_id: categoryId
+        })
+        
+        if (searchError) {
+          console.error('Error fetching search results:', searchError)
+          setFilteredProducts([])
+        } else {
+          setFilteredProducts(searchData || [])
+        }
+        
+        // Fetch categories if not already loaded
+        if (categories.length === 0) {
+          const { data: categoriesData, error: categoriesError } = await getCategories()
+          if (!categoriesError) {
+            setCategories(categoriesData || [])
+          }
+        }
+      } catch (error) {
+        console.error('Error in search:', error)
+        setFilteredProducts([])
       }
       
       setLoading(false)
     }
     
     fetchSearchResults()
-  }, [query, category])
+  }, [query, category, categories.length])
 
   // Apply sorting
   useEffect(() => {
@@ -127,8 +97,7 @@ export function SearchPageClient() {
           sortedProducts.sort((a, b) => b.rating - a.rating)
           break
         case "newest":
-          // In a real app, you'd sort by creation date
-          sortedProducts.sort((a, b) => b.id.localeCompare(a.id))
+          sortedProducts.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
           break
         default:
           // Relevance - keep original order from search
@@ -181,11 +150,11 @@ export function SearchPageClient() {
             {categories.map((cat) => (
               <Badge
                 key={cat.id}
-                variant={category === cat.name.toLowerCase() ? "default" : "outline"}
+                variant={category === cat.slug || category === cat.name.toLowerCase() ? "default" : "outline"}
                 className="cursor-pointer hover:bg-primary hover:text-primary-foreground"
                 onClick={() => {
                   const params = new URLSearchParams(searchParams)
-                  params.set("category", cat.name.toLowerCase())
+                  params.set("category", cat.slug)
                   router.push(`/search?${params.toString()}`)
                 }}
               >

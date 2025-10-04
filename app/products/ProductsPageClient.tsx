@@ -8,15 +8,16 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { ProductCard } from "@/components/product-card"
-import { getCategories, getProducts } from "@/data/mock-products"
+import { getCategories, getProductsWithOptions } from "@/data/mock-products"
+import { ProductWithCategory, Category } from "@/types/database"
 
 // Client-only Products page: fetches from Supabase and updates UI without navigation
 export function ProductsPageClient() {
   type SortKey = "newest" | "price-low" | "price-high" | "rating"
   type ViewMode = "grid" | "list"
 
-  const [products, setProducts] = useState<any[]>([])
-  const [categories, setCategories] = useState<any[]>([])
+  const [products, setProducts] = useState<ProductWithCategory[]>([])
+  const [categories, setCategories] = useState<Category[]>([])
   const [selectedCategory, setSelectedCategory] = useState<string | undefined>(undefined)
   const [sort, setSort] = useState<SortKey>("newest")
   const [view, setView] = useState<ViewMode>("grid")
@@ -32,10 +33,11 @@ export function ProductsPageClient() {
     let cancelled = false
     async function init() {
       setLoading(true)
-      const [cats, prods] = await Promise.all([
+      const [catsResponse, prods] = await Promise.all([
         getCategories(),
-        getProducts({ sort }),
+        getProductsWithOptions({ sort }),
       ])
+      const cats = catsResponse.data || []
       if (!cancelled) {
         setCategories(cats || [])
         setProducts(prods || [])
@@ -54,7 +56,7 @@ export function ProductsPageClient() {
     setLoading(true)
 
     const handle = setTimeout(async () => {
-      const prods = await getProducts({
+      const prods = await getProductsWithOptions({
         category: selectedCategory,
         sort,
         minPrice,
@@ -84,14 +86,14 @@ export function ProductsPageClient() {
           >
             ALL CATEGORIES
           </Badge>
-          {categories.map((cat: any) => (
+          {categories.map((cat) => (
             <Badge
               key={cat.id}
-              variant={selectedCategory === cat.name ? "default" : "outline"}
-              className={`cursor-pointer font-mono text-xs font-bold ${selectedCategory === cat.name ? "bg-orange-500 text-white hover:bg-orange-500/90" : "border border-neutral-700 text-neutral-400 hover:bg-neutral-800 hover:text-white"}`}
-              onClick={() => setSelectedCategory(cat.name)}
+              variant={selectedCategory === cat.slug ? "default" : "outline"}
+              className={`cursor-pointer font-mono text-xs font-bold ${selectedCategory === cat.slug ? "bg-orange-500 text-white hover:bg-orange-500/90" : "border border-neutral-700 text-neutral-400 hover:bg-neutral-800 hover:text-white"}`}
+              onClick={() => setSelectedCategory(cat.slug)}
             >
-              {String(cat.name).toUpperCase()}
+              {cat.name.toUpperCase()}
             </Badge>
           ))}
         </div>
@@ -202,14 +204,14 @@ export function ProductsPageClient() {
   )
 }
 
-function ListProductItem({ product }: { product: any }) {
+function ListProductItem({ product }: { product: ProductWithCategory }) {
   return (
     <Card className="overflow-hidden bg-neutral-900 border-neutral-700">
       <CardContent className="p-4">
         <div className="flex gap-4">
           <div className="w-28 h-28 overflow-hidden rounded bg-neutral-800 flex-shrink-0">
             <img
-              src={product.image || "/placeholder.svg"}
+              src={product.main_image_url || "/placeholder.svg"}
               alt={product.title}
               className="h-full w-full object-cover"
             />
@@ -218,7 +220,7 @@ function ListProductItem({ product }: { product: any }) {
             <Link href={`/products/${product.slug}`} className="block">
               <h3 className="text-base font-semibold text-white line-clamp-2">{product.title}</h3>
             </Link>
-            <div className="mt-1 text-sm text-neutral-400 line-clamp-2">{product.shortDescription}</div>
+            <div className="mt-1 text-sm text-neutral-400 line-clamp-2">{product.short_description}</div>
             <div className="mt-2 flex items-center justify-between">
               <div className="text-lg font-semibold text-white">₹{Number(product.price).toLocaleString('en-IN')}</div>
               <Button
@@ -226,7 +228,7 @@ function ListProductItem({ product }: { product: any }) {
                 size="sm"
                 className="bg-orange-500 text-white hover:bg-orange-600 font-medium rounded-lg"
               >
-                <a href={product.amazonLink} target="_blank" rel="noopener noreferrer">
+                <a href={product.affiliate_url} target="_blank" rel="noopener noreferrer">
                   Buy
                 </a>
               </Button>

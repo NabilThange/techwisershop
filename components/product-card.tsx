@@ -3,45 +3,19 @@ import { ExternalLink } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { LazyImage } from "@/components/lazy-image"
-
-interface Product {
-  id: string
-  slug: string
-  title: string
-  price: number
-  originalPrice?: number
-  currency: string
-  image: string
-  images: string[]
-  amazonLink: string
-  flipkartLink: string
-  rating: number
-  reviewCount: number
-  shortDescription: string
-  description: string
-  category: string
-  brand: string
-  specs: Record<string, string>
-  pros: string[]
-  cons: string[]
-  youtubeVideoId: string
-  inStock: boolean
-  featured: boolean
-  tags: string[]
-  createdAt?: string
-}
+import { ProductWithCategory } from "@/types/database"
 
 interface ProductCardProps {
-  product: Product
+  product: ProductWithCategory
   className?: string
   priority?: boolean
 }
 
 export function ProductCard({ product, className = "", priority = false }: ProductCardProps) {
-  const finalPrice = product.originalPrice && product.originalPrice > product.price ? product.price : product.price
+  const finalPrice = product.original_price && product.original_price > product.price ? product.price : product.price
 
-  const hasDiscount = typeof product.originalPrice === "number" && product.originalPrice > product.price
-  const discountPercent = hasDiscount ? Math.round(100 - (product.price / (product.originalPrice as number)) * 100) : 0
+  const hasDiscount = typeof product.original_price === "number" && product.original_price > product.price
+  const discountPercent = hasDiscount ? Math.round(100 - (product.price / (product.original_price as number)) * 100) : 0
 
   return (
     <Card
@@ -54,8 +28,8 @@ export function ProductCard({ product, className = "", priority = false }: Produ
         <Link href={`/products/${product.slug}`} className="block outline-none focus-visible:ring-0">
           <div className="aspect-square overflow-hidden">
             <LazyImage
-              src={product.image || "/placeholder.svg"}
-              alt={`${product.title} - ${product.shortDescription}`}
+              src={product.main_image_url || "/placeholder.svg"}
+              alt={`${product.title} - ${product.short_description || product.title}`}
               width={400}
               height={400}
               className="h-full w-full object-cover transition-transform duration-300 ease-out motion-safe:group-hover:scale-105"
@@ -73,7 +47,7 @@ export function ProductCard({ product, className = "", priority = false }: Produ
             {discountPercent}% OFF
           </span>
         ) : (
-          product.inStock && (
+          product.in_stock && (
             <span
               className="absolute left-3 top-3 rounded-md bg-neutral-700 px-2 py-1 text-[12px] font-medium text-white shadow-sm"
               aria-label="In stock"
@@ -109,7 +83,7 @@ export function ProductCard({ product, className = "", priority = false }: Produ
               </span>
               {hasDiscount && (
                 <span className="text-sm text-muted-foreground line-through truncate">
-                  ₹{(product.originalPrice as number).toLocaleString("en-IN")}
+                  ₹{(product.original_price as number).toLocaleString("en-IN")}
                 </span>
               )}
             </div>
@@ -118,16 +92,16 @@ export function ProductCard({ product, className = "", priority = false }: Produ
               asChild
               size="sm"
               className="shrink-0 bg-orange-500 text-white hover:bg-orange-600 font-medium transition-transform duration-200 hover:-translate-y-0.5 rounded-lg focus-visible:ring-2 focus-visible:ring-orange-500/60 whitespace-nowrap text-xs min-w-[90px]"
-              disabled={!product.inStock}
+              disabled={!product.in_stock}
             >
               <a
-                href={product.amazonLink}
+                href={product.affiliate_url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center justify-center gap-1"
                 aria-label={`Buy ${product.title}`}
               >
-                {product.inStock ? (
+                {product.in_stock ? (
                   <>
                     <span className="hidden xs:inline">Buy</span>
                     <span className="xs:hidden">B</span>

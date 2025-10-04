@@ -8,7 +8,8 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import Image from "next/image"
-import { supabase } from '@/lib/supabase-client'
+import { searchProducts } from '@/lib/supabase-client'
+import { ProductWithCategory } from '@/types/database'
 
 interface SearchBarProps {
   className?: string
@@ -19,7 +20,7 @@ export function SearchBar({ className = "", placeholder = "Search products..." }
   const [query, setQuery] = useState("")
   const [isOpen, setIsOpen] = useState(false)
   const [recentSearches, setRecentSearches] = useState<string[]>([])
-  const [filteredProducts, setFilteredProducts] = useState<any[]>([])
+  const [filteredProducts, setFilteredProducts] = useState<ProductWithCategory[]>([])
   const [loading, setLoading] = useState(false)
   const searchRef = useRef<HTMLDivElement>(null)
 
@@ -45,37 +46,19 @@ export function SearchBar({ className = "", placeholder = "Search products..." }
     if (query.length > 2) {
       const fetchSearchResults = async () => {
         setLoading(true)
-        const { data, error } = await supabase
-          .from('products')
-          .select(`
-            id,
-            slug,
-            title,
-            price,
-            currency,
-            main_image_url,
-            categories (name)
-          `)
-          .or(
-            `title.ilike.%${query}%,brand.ilike.%${query}%,categories.name.ilike.%${query}%`
-          )
-          .limit(6)
-
-        if (error) {
-          console.error('Error fetching search results:', error)
-        } else {
-          // Transform data to match expected format
-          const transformedProducts = data?.map((product: any) => ({
-            id: product.id,
-            slug: product.slug,
-            title: product.title,
-            price: product.price,
-            currency: product.currency,
-            image: product.main_image_url,
-            category: product.categories?.name || ''
-          })) || []
+        try {
+          const { data, error } = await searchProducts(query)
           
-          setFilteredProducts(transformedProducts)
+          if (error) {
+            console.error('Error fetching search results:', error)
+            setFilteredProducts([])
+          } else {
+            // Limit to 6 results for dropdown
+            setFilteredProducts((data || []).slice(0, 6))
+          }
+        } catch (error) {
+          console.error('Search error:', error)
+          setFilteredProducts([])
         }
         setLoading(false)
       }
@@ -157,7 +140,7 @@ export function SearchBar({ className = "", placeholder = "Search products..." }
                   >
                     <div className="h-10 w-10 overflow-hidden rounded bg-muted flex-shrink-0">
                       <Image
-                        src={product.image || "/placeholder.svg"}
+                        src={product.main_image_url || "/placeholder.svg"}
                         alt={product.title}
                         width={40}
                         height={40}
@@ -167,9 +150,11 @@ export function SearchBar({ className = "", placeholder = "Search products..." }
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium truncate">{product.title}</p>
                       <div className="flex items-center gap-2">
-                        <Badge variant="outline" className="text-xs">
-                          {product.category}
-                        </Badge>
+                        {product.category && (
+                          <Badge variant="outline" className="text-xs">
+                            {product.category.name}
+                          </Badge>
+                        )}
                         <span className="text-xs text-muted-foreground">₹{product.price.toLocaleString("en-IN")}</span>
                       </div>
                     </div>

@@ -11,7 +11,7 @@ import { ProductCard } from "@/components/product-card"
 import { StructuredData, generateProductFAQ } from "@/components/structured-data"
 import { getProductBySlug, getProductsByCategory } from "@/data/mock-products"
 import { YouTubeEmbed } from "@/components/youtube-embed"
-import type { Product } from "@/data/mock-products"
+import type { ProductWithCategory } from "@/types/database"
 
 interface ProductPageProps {
   params: {
@@ -26,43 +26,18 @@ export default async function ProductPage({ params }: ProductPageProps) {
     notFound()
   }
 
-  const relatedProducts = await getProductsByCategory(product.category)
-  // Create a proper Product object for the FAQ generator
-  const productForFAQ: any = {
-    id: product.id,
-    slug: product.slug,
-    title: product.title,
-    price: product.price,
-    originalPrice: product.originalPrice,
-    currency: product.currency,
-    image: product.image,
-    images: product.images,
-    amazonLink: product.amazonLink,
-    flipkartLink: product.flipkartLink,
-    rating: product.rating,
-    reviewCount: product.reviewCount,
-    shortDescription: product.shortDescription,
-    description: product.description,
-    category: product.category,
-    brand: product.brand,
-    specs: product.specs,
-    pros: product.pros,
-    cons: product.cons,
-    youtubeVideoId: product.youtubeVideoId,
-    inStock: product.inStock,
-    featured: product.featured,
-    tags: product.tags
-  }
-  const productFAQ = generateProductFAQ(productForFAQ as Product)
+  const relatedProducts = product.category ? await getProductsByCategory(product.category.slug) : []
+  // Product FAQ
+  const productFAQ = generateProductFAQ(product as any)
 
-  const discountPercentage = product.originalPrice
-    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
+  const discountPercentage = product.original_price
+    ? Math.round(((product.original_price - product.price) / product.original_price) * 100)
     : 0
 
   const breadcrumbData = [
     { name: "Home", url: "https://techwiser.shop" },
     { name: "Products", url: "https://techwiser.shop/products" },
-    { name: product.category, url: `https://techwiser.shop/categories/${product.category.toLowerCase()}` },
+    { name: product.category?.name || "Products", url: `https://techwiser.shop/categories/${product.category?.slug || ''}` },
     { name: product.title, url: `https://techwiser.shop/products/${product.slug}` },
   ]
 
@@ -86,10 +61,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
           </Link>
           <span>/</span>
           <Link
-            href={`/categories/${product.category.toLowerCase()}`}
+            href={`/categories/${product.category?.slug || ''}`}
             className="hover:text-orange-500 transition-colors"
           >
-            {product.category.toUpperCase()}
+            {product.category?.name.toUpperCase() || 'PRODUCT'}
           </Link>
           <span>/</span>
           <span className="text-white">{product.title.toUpperCase()}</span>
@@ -113,7 +88,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
           <div className="space-y-4">
             <div className="aspect-square overflow-hidden rounded-lg bg-neutral-900 border border-neutral-700">
               <Image
-                src={product.image || "/placeholder.svg"}
+                src={product.main_image_url || "/placeholder.svg"}
                 alt={product.title}
                 width={600}
                 height={600}
@@ -121,22 +96,24 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 priority
               />
             </div>
-            <div className="grid grid-cols-3 gap-2">
-              {product.images.map((image: string, index: number) => (
-                <div
-                  key={index}
-                  className="aspect-square overflow-hidden rounded-md bg-neutral-900 border border-neutral-700"
-                >
-                  <Image
-                    src={image || "/placeholder.svg"}
-                    alt={`${product.title} view ${index + 1}`}
-                    width={200}
-                    height={200}
-                    className="h-full w-full object-cover cursor-pointer hover:opacity-80"
-                  />
-                </div>
-              ))}
-            </div>
+            {product.additional_images && product.additional_images.length > 0 && (
+              <div className="grid grid-cols-3 gap-2">
+                {product.additional_images.map((image: string, index: number) => (
+                  <div
+                    key={index}
+                    className="aspect-square overflow-hidden rounded-md bg-neutral-900 border border-neutral-700"
+                  >
+                    <Image
+                      src={image || "/placeholder.svg"}
+                      alt={`${product.title} view ${index + 1}`}
+                      width={200}
+                      height={200}
+                      className="h-full w-full object-cover cursor-pointer hover:opacity-80"
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Product Info */}
@@ -144,12 +121,14 @@ export default async function ProductPage({ params }: ProductPageProps) {
             <div>
               <div className="mb-2 flex items-center gap-2">
                 <Badge className="border border-orange-500 text-orange-500 bg-transparent hover:bg-orange-500/10 font-mono text-xs font-bold">
-                  {product.category.toUpperCase()}
+                  {product.category?.name.toUpperCase() || 'PRODUCT'}
                 </Badge>
-                <Badge className="border border-neutral-700 text-neutral-400 bg-transparent hover:bg-neutral-800 font-mono text-xs font-bold">
-                  {product.brand.toUpperCase()}
-                </Badge>
-                {!product.inStock && (
+                {product.brand_name && (
+                  <Badge className="border border-neutral-700 text-neutral-400 bg-transparent hover:bg-neutral-800 font-mono text-xs font-bold">
+                    {product.brand_name.toUpperCase()}
+                  </Badge>
+                )}
+                {!product.in_stock && (
                   <Badge className="bg-red-500 text-white font-mono text-xs font-bold">OUT OF STOCK</Badge>
                 )}
               </div>
@@ -170,10 +149,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
                   ))}
                   <span className="ml-2 text-sm font-medium text-white font-mono">{product.rating}</span>
                 </div>
-                <span className="text-sm text-neutral-400 font-mono">({product.reviewCount} TACTICAL REVIEWS)</span>
+                <span className="text-sm text-neutral-400 font-mono">({product.review_count} TACTICAL REVIEWS)</span>
               </div>
 
-              <p className="text-neutral-400 font-mono text-sm">{product.description}</p>
+              <p className="text-neutral-400 font-mono text-sm">{product.description || product.short_description}</p>
             </div>
 
             {/* Pricing */}
@@ -182,10 +161,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 <span className="text-3xl font-bold text-white font-mono">
                   ₹{product.price.toLocaleString("en-IN")}
                 </span>
-                {product.originalPrice && (
+                {product.original_price && (
                   <>
                     <span className="text-xl text-neutral-500 line-through font-mono">
-                      ₹{product.originalPrice.toLocaleString("en-IN")}
+                      ₹{product.original_price.toLocaleString("en-IN")}
                     </span>
                     <Badge className="bg-orange-500 text-white font-mono text-xs font-bold">
                       -{discountPercentage}% OFF
@@ -204,31 +183,13 @@ export default async function ProductPage({ params }: ProductPageProps) {
               <div className="grid gap-3 sm:grid-cols-2">
                 <Button size="lg" className="bg-orange-500 hover:bg-orange-500/90 font-mono text-xs font-bold" asChild>
                   <a
-                    href={product.amazonLink}
+                    href={product.affiliate_url}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center justify-center gap-2"
                   >
                     <ShoppingCart className="h-5 w-5" />
-                    BUY ON AMAZON
-                    <ExternalLink className="h-4 w-4" />
-                  </a>
-                </Button>
-
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="bg-transparent border-neutral-700 text-neutral-400 hover:bg-neutral-800 hover:text-white font-mono text-xs font-bold"
-                  asChild
-                >
-                  <a
-                    href={product.flipkartLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-2"
-                  >
-                    <ShoppingCart className="h-5 w-5" />
-                    BUY ON FLIPKART
+                    BUY NOW
                     <ExternalLink className="h-4 w-4" />
                   </a>
                 </Button>
@@ -272,12 +233,15 @@ export default async function ProductPage({ params }: ProductPageProps) {
               <CardTitle className="text-white font-mono">TACTICAL SPECIFICATIONS</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              {Object.entries(product.specs).map(([key, value]) => (
+              {product.specifications && Object.entries(product.specifications).map(([key, value]) => (
                 <div key={key} className="flex justify-between">
                   <span className="text-neutral-400 font-mono text-sm">{key.toUpperCase()}</span>
                   <span className="font-medium text-white font-mono text-sm">{value as string}</span>
                 </div>
               ))}
+              {(!product.specifications || Object.keys(product.specifications).length === 0) && (
+                <p className="text-neutral-500 font-mono text-sm">Specifications not available</p>
+              )}
             </CardContent>
           </Card>
 
@@ -291,12 +255,15 @@ export default async function ProductPage({ params }: ProductPageProps) {
             </CardHeader>
             <CardContent>
               <ul className="space-y-2">
-                {product.pros.map((pro: string, index: number) => (
+                {product.pros && product.pros.map((pro: string, index: number) => (
                   <li key={index} className="flex items-start gap-2">
                     <Check className="mt-0.5 h-4 w-4 text-green-500 flex-shrink-0" />
                     <span className="text-sm text-neutral-400 font-mono">{pro}</span>
                   </li>
                 ))}
+                {(!product.pros || product.pros.length === 0) && (
+                  <li className="text-neutral-500 font-mono text-sm">No advantages listed</li>
+                )}
               </ul>
             </CardContent>
           </Card>
@@ -311,12 +278,15 @@ export default async function ProductPage({ params }: ProductPageProps) {
             </CardHeader>
             <CardContent>
               <ul className="space-y-2">
-                {product.cons.map((con: string, index: number) => (
+                {product.cons && product.cons.map((con: string, index: number) => (
                   <li key={index} className="flex items-start gap-2">
                     <X className="mt-0.5 h-4 w-4 text-red-500 flex-shrink-0" />
                     <span className="text-sm text-neutral-400 font-mono">{con}</span>
                   </li>
                 ))}
+                {(!product.cons || product.cons.length === 0) && (
+                  <li className="text-neutral-500 font-mono text-sm">No limitations listed</li>
+                )}
               </ul>
             </CardContent>
           </Card>
@@ -332,7 +302,11 @@ export default async function ProductPage({ params }: ProductPageProps) {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <YouTubeEmbed videoId={product.youtubeVideoId} title={`${product.title} Review`} />
+              {product.youtube_video_id ? (
+                <YouTubeEmbed videoId={product.youtube_video_id} title={`${product.title} Review`} />
+              ) : (
+                <p className="text-neutral-500 font-mono text-sm">Video review not available</p>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -380,16 +354,18 @@ export async function generateMetadata({ params }: ProductPageProps) {
     }
   }
 
+  const description = product.description || product.short_description || `${product.title} review`
+  
   return {
     title: `${product.title} Review: Is It Worth It? | TECHWISER`,
-    description: `${product.description} Read our detailed review with pros, cons, specifications, and where to buy at the best price in India.`,
-    keywords: `${product.title}, ${product.brand}, ${product.category}, review, specs, price, buy online, India`,
+    description: `${description} Read our detailed review with pros, cons, specifications, and where to buy at the best price in India.`,
+    keywords: `${product.title}, ${product.brand_name || ''}, ${product.category?.name || ''}, review, specs, price, buy online, India`,
     openGraph: {
       title: `${product.title} Review | TECHWISER`,
-      description: product.description,
+      description: description,
       images: [
         {
-          url: product.image,
+          url: product.main_image_url,
           width: 600,
           height: 600,
           alt: product.title,
@@ -400,8 +376,8 @@ export async function generateMetadata({ params }: ProductPageProps) {
     twitter: {
       card: "summary_large_image",
       title: `${product.title} Review | TECHWISER`,
-      description: product.description,
-      images: [product.image],
+      description: description,
+      images: [product.main_image_url],
     },
     alternates: {
       canonical: `https://techwiser.shop/products/${product.slug}`,

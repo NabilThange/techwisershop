@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { ProductCard } from "@/components/product-card"
-import { getCategories, getProductsByCategory } from "@/data/mock-products"
+import { getCategories, getProductsByCategory, getCategoryBySlug } from "@/data/mock-products"
+import { Category, ProductWithCategory } from "@/types/database"
 
 interface CategoryPageProps {
   params: {
@@ -14,14 +15,13 @@ interface CategoryPageProps {
 }
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
-  const categories = await getCategories()
-  const category = categories.find((c: any) => c.slug === params.slug)
+  const { data: category, error } = await getCategoryBySlug(params.slug)
 
-  if (!category) {
+  if (error || !category) {
     notFound()
   }
 
-  const products = await getProductsByCategory(category.name)
+  const products = await getProductsByCategory(params.slug)
 
   return (
     <div className="min-h-screen bg-background">
@@ -52,8 +52,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
         <div className="mb-8">
           <h1 className="mb-4 text-3xl font-bold">{category.name} Products</h1>
           <p className="text-muted-foreground">
-            Explore our curated selection of {category.name.toLowerCase()} products with detailed reviews and honest
-            recommendations
+            {category.description || `Explore our curated selection of ${category.name.toLowerCase()} products with detailed reviews and honest recommendations`}
           </p>
         </div>
 
@@ -76,8 +75,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
 }
 
 export async function generateMetadata({ params }: CategoryPageProps) {
-  const categories = await getCategories()
-  const category = categories.find((c: any) => c.slug === params.slug)
+  const { data: category } = await getCategoryBySlug(params.slug)
 
   if (!category) {
     return {
@@ -87,14 +85,14 @@ export async function generateMetadata({ params }: CategoryPageProps) {
 
   return {
     title: `Best ${category.name} Products 2025 - Reviews & Buying Guide | TECHWISER`,
-    description: `Discover the best ${category.name.toLowerCase()} products with detailed reviews, comparisons, and buying guides. Find the perfect ${category.name.toLowerCase()} for your needs.`,
+    description: category.description || `Discover the best ${category.name.toLowerCase()} products with detailed reviews, comparisons, and buying guides. Find the perfect ${category.name.toLowerCase()} for your needs.`,
     keywords: `${category.name}, best ${category.name.toLowerCase()}, ${category.name.toLowerCase()} reviews, buying guide`,
   }
 }
 
 export async function generateStaticParams() {
-  const categories = await getCategories()
-  return categories.map((category: any) => ({
+  const { data: categories } = await getCategories()
+  return (categories || []).map((category) => ({
     slug: category.slug,
   }))
 }
